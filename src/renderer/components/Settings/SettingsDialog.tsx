@@ -20,6 +20,7 @@ import { useTranslation } from 'react-i18next';
 import { AppSettings } from '@/types/settings';
 import { Folder as FolderIcon } from '@mui/icons-material';
 import { IpcRendererManager } from '@/shared/IpcManager';
+import { generateRandomName } from '@/utils/nameGenerator';
 
 interface SettingsDialogProps {
   open: boolean;
@@ -37,6 +38,12 @@ const SettingsDialog: React.FC<SettingsDialogProps> = ({
   const { t, i18n } = useTranslation();
   const [localSettings, setLocalSettings] = React.useState<AppSettings>(settings);
 
+  React.useEffect(() => {
+    if (open) {
+      setLocalSettings(settings);
+    }
+  }, [open, settings]);
+
   const handleChange = <T extends keyof AppSettings>(
     key: T,
     value: AppSettings[T]
@@ -45,9 +52,17 @@ const SettingsDialog: React.FC<SettingsDialogProps> = ({
   };
 
   const handleSave = () => {
-    onSave(localSettings);
-    if (localSettings.language !== settings.language) {
-      i18n.changeLanguage(localSettings.language);
+    const newSettings = { ...localSettings };
+    
+    // 根据当前语言生成随机名字
+    if (!newSettings.userName.trim()) {
+      newSettings.userName = generateRandomName(newSettings.language);
+      setLocalSettings(newSettings);
+    }
+    
+    onSave(newSettings);
+    if (newSettings.language !== settings.language) {
+      i18n.changeLanguage(newSettings.language);
     }
     onClose();
   };
