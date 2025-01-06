@@ -7,8 +7,8 @@ const resources = {
       welcome: 'Welcome to WiFly',
       dropzone: {
         drop: 'Drop files here',
-        dragOrClick: 'Drag files here or click to select',
-        supportedFiles: 'Support all file types',
+        dragOrClick: 'Drag and drop files here or click to select',
+        supportedFiles: 'All file types supported',
       },
       fileSelect: {
         title: 'Send files to {{deviceName}}',
@@ -23,10 +23,10 @@ const resources = {
           completed: 'File Transfer Completed',
           error: 'File Transfer Error',
           progressBody: '{{fileName}}: {{percentage}}% completed',
-          completedBody: '{{fileName}} has been transferred successfully',
-          errorBody: 'Failed to transfer {{fileName}}: {{error}}',
+          completedBody: '{{fileName}} transferred successfully',
+          errorBody: '{{fileName}} transfer failed: {{error}}',
           cancelled: 'Transfer Cancelled',
-          cancelledBody: '{{fileName}} transfer has been cancelled',
+          cancelledBody: '{{fileName}} transfer cancelled',
         },
       },
       error: {
@@ -39,7 +39,7 @@ const resources = {
         quit: 'Quit',
         openDownloadFolder: 'Open Download Folder',
         settings: 'Settings',
-        autoStart: 'Start with System',
+        autoStart: 'Start on Boot',
         minimizeToTray: 'Minimize to Tray',
       },
       history: {
@@ -60,6 +60,22 @@ const resources = {
         importError: 'Failed to import history',
         exportError: 'Failed to export history',
         deleteError: 'Failed to delete record',
+      },
+      settings: {
+        title: 'Settings',
+        theme: 'Theme',
+        language: 'Language',
+        save: 'Save',
+        cancel: 'Cancel',
+        theme: {
+          light: 'Light',
+          dark: 'Dark',
+          system: 'System',
+        },
+        languages: {
+          en: 'English',
+          zh: '中文',
+        }
       },
       common: {
         loading: 'Loading...',
@@ -140,7 +156,7 @@ i18n
   .use(initReactI18next)
   .init({
     resources,
-    lng: 'zh',
+    lng: 'en',
     fallbackLng: 'en',
     interpolation: {
       escapeValue: false,

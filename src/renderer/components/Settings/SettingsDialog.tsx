@@ -30,7 +30,7 @@ const SettingsDialog: React.FC<SettingsDialogProps> = ({
   onClose,
   onSave,
 }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [localSettings, setLocalSettings] = React.useState<AppSettings>(settings);
 
   const handleChange = <T extends keyof AppSettings>(
@@ -42,14 +42,59 @@ const SettingsDialog: React.FC<SettingsDialogProps> = ({
 
   const handleSave = () => {
     onSave(localSettings);
+    if (localSettings.language !== settings.language) {
+      i18n.changeLanguage(localSettings.language);
+    }
     onClose();
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+    <Dialog 
+      open={open} 
+      onClose={onClose} 
+      maxWidth="sm" 
+      fullWidth
+      PaperProps={{
+        sx: {
+          background: 'rgba(26,26,26,0.9)',
+          backdropFilter: 'blur(12px)',
+        }
+      }}
+    >
       <DialogTitle>{t('settings.title')}</DialogTitle>
       <DialogContent>
         <Box sx={{ py: 2 }}>
+          <FormControl fullWidth sx={{ mb: 2 }}>
+            <Typography 
+              variant="subtitle2" 
+              gutterBottom
+              sx={{ color: 'rgba(255,255,255,0.9)' }}
+            >
+              {t('settings.language')}
+            </Typography>
+            <Select
+              value={localSettings.language}
+              onChange={(e) => handleChange('language', e.target.value as string)}
+              sx={{
+                '& .MuiSelect-select': {
+                  color: '#fff',
+                },
+                '& .MuiOutlinedInput-notchedOutline': {
+                  borderColor: 'rgba(0,255,245,0.3)',
+                },
+                '&:hover .MuiOutlinedInput-notchedOutline': {
+                  borderColor: 'rgba(0,255,245,0.5)',
+                },
+                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                  borderColor: '#00fff5',
+                },
+              }}
+            >
+              <MenuItem value="en">{t('settings.languages.en')}</MenuItem>
+              <MenuItem value="zh">{t('settings.languages.zh')}</MenuItem>
+            </Select>
+          </FormControl>
+
           <FormControl fullWidth sx={{ mb: 2 }}>
             <Typography variant="subtitle2" gutterBottom>
               {t('settings.theme')}
@@ -61,19 +106,6 @@ const SettingsDialog: React.FC<SettingsDialogProps> = ({
               <MenuItem value="light">{t('settings.theme.light')}</MenuItem>
               <MenuItem value="dark">{t('settings.theme.dark')}</MenuItem>
               <MenuItem value="system">{t('settings.theme.system')}</MenuItem>
-            </Select>
-          </FormControl>
-
-          <FormControl fullWidth sx={{ mb: 2 }}>
-            <Typography variant="subtitle2" gutterBottom>
-              {t('settings.language')}
-            </Typography>
-            <Select
-              value={localSettings.language}
-              onChange={(e) => handleChange('language', e.target.value as string)}
-            >
-              <MenuItem value="zh">中文</MenuItem>
-              <MenuItem value="en">English</MenuItem>
             </Select>
           </FormControl>
 
@@ -129,10 +161,31 @@ const SettingsDialog: React.FC<SettingsDialogProps> = ({
           />
         </Box>
       </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose}>{t('common.cancel')}</Button>
-        <Button onClick={handleSave} variant="contained">
-          {t('common.save')}
+      <DialogActions sx={{ p: 3 }}>
+        <Button 
+          onClick={onClose}
+          sx={{
+            color: 'rgba(255,255,255,0.7)',
+            '&:hover': {
+              color: '#fff',
+              background: 'rgba(255,255,255,0.1)',
+            }
+          }}
+        >
+          {t('common.cancel')}
+        </Button>
+        <Button 
+          onClick={handleSave}
+          variant="contained"
+          sx={{
+            background: 'linear-gradient(45deg, #00fff5, #ff0099)',
+            color: '#000',
+            '&:hover': {
+              boxShadow: '0 0 20px rgba(0,255,245,0.5)',
+            }
+          }}
+        >
+          {t('settings.save')}
         </Button>
       </DialogActions>
     </Dialog>
