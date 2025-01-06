@@ -6,9 +6,10 @@ import { useTranslation } from 'react-i18next';
 interface MainLayoutProps {
   children: React.ReactNode;
   onOpenSettings: () => void;
+  userName?: string;
 }
 
-const MainLayout: React.FC<MainLayoutProps> = ({ children, onOpenSettings }) => {
+const MainLayout: React.FC<MainLayoutProps> = ({ children, onOpenSettings, userName }) => {
   const { t } = useTranslation();
 
   return (
@@ -37,40 +38,45 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children, onOpenSettings }) => 
         justifyContent: 'space-between',
         background: 'transparent'
       }}>
-        <Typography 
-          variant="h5" 
-          component="div" 
-          sx={{ 
-            fontWeight: 700,
-            display: 'flex',
-            alignItems: 'center',
-            gap: 1,
-            '&::before': {
-              content: '""',
-              width: '24px',
-              height: '24px',
-              background: 'linear-gradient(45deg, #00fff5, #ff0099)',
-              clipPath: 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)',
-              animation: 'rotate 4s linear infinite',
-              boxShadow: '0 0 20px rgba(0,255,245,0.5)',
-            },
-            '@keyframes rotate': {
-              '0%': {
-                transform: 'rotate(0deg)'
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <Typography 
+            variant="h5" 
+            component="div" 
+            sx={{ 
+              fontWeight: 700,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1,
+              '&::before': {
+                content: '""',
+                width: '24px',
+                height: '24px',
+                background: 'linear-gradient(45deg, #00fff5, #ff0099)',
+                clipPath: 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)',
+                animation: 'rotate 4s linear infinite',
+                boxShadow: '0 0 20px rgba(0,255,245,0.5)',
               },
-              '100%': {
-                transform: 'rotate(360deg)'
-              }
-            },
-            background: 'linear-gradient(45deg, #00fff5, #ff0099)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            textShadow: '0 0 20px rgba(0,255,245,0.5)',
-            letterSpacing: '1px'
-          }}
-        >
-          WiFly
-        </Typography>
+              '@keyframes rotate': {
+                '0%': {
+                  transform: 'rotate(0deg)'
+                },
+                '100%': {
+                  transform: 'rotate(360deg)'
+                }
+              },
+              background: 'linear-gradient(45deg, #00fff5, #ff0099)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              textShadow: '0 0 20px rgba(0,255,245,0.5)',
+              letterSpacing: '1px'
+            }}
+          >
+            WiFly
+          </Typography>
+          <Typography variant="subtitle1" sx={{ color: 'rgba(255,255,255,0.7)' }}>
+            {userName}
+          </Typography>
+        </Box>
         <IconButton
           size="large"
           onClick={onOpenSettings}

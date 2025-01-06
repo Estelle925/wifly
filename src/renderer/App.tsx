@@ -10,14 +10,16 @@ import { AppSettings } from '@/types/settings';
 import { IpcRendererManager } from '@/shared/IpcManager';
 import FileSelectDialog from './components/FileTransfer/FileSelectDialog';
 import TransferHistory from './components/History/TransferHistory';
+import { useTranslation } from 'react-i18next';
 
 const App: React.FC = () => {
+  const { i18n } = useTranslation();
   const [devices, setDevices] = useState<Device[]>([]);
   const [transfers, setTransfers] = useState<FileProgress[]>([]);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [settings, setSettings] = useState<AppSettings>({
-    theme: 'system',
     language: 'zh',
+    userName: 'User',
     autoStart: false,
     minimizeToTray: true,
     enableAnimations: true,
@@ -31,6 +33,7 @@ const App: React.FC = () => {
     const loadSettings = async () => {
       const savedSettings = await IpcRendererManager.invoke('settings:get');
       setSettings(savedSettings);
+      i18n.changeLanguage(savedSettings.language);
     };
 
     loadSettings();
@@ -42,7 +45,7 @@ const App: React.FC = () => {
     return () => {
       unsubscribe();
     };
-  }, []);
+  }, [i18n]);
 
   // 监听文件传输进度
   useEffect(() => {
@@ -114,7 +117,10 @@ const App: React.FC = () => {
   };
 
   return (
-    <MainLayout onOpenSettings={handleOpenSettings}>
+    <MainLayout 
+      onOpenSettings={handleOpenSettings}
+      userName={settings.userName}
+    >
       <Container maxWidth="md">
         <Box sx={{ mb: 3 }}>
           <DeviceList

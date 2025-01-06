@@ -167,6 +167,13 @@ export class IpcMainManager {
     ipcMain.handle('app:quit', () => {
       app.quit();
     });
+
+    ipcMain.handle('directory:select', async () => {
+      const result = await dialog.showOpenDialog({
+        properties: ['openDirectory']
+      });
+      return result.filePaths[0];
+    });
   }
 
   // 广播消息给所有渲染进程

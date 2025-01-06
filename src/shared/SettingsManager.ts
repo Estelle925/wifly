@@ -14,8 +14,8 @@ export class SettingsManager {
 
   private getDefaultSettings(): AppSettings {
     return {
-      theme: 'system',
       language: 'zh',
+      userName: 'User',
       autoStart: false,
       minimizeToTray: true,
       enableAnimations: true,

@@ -28,6 +28,9 @@ export interface IpcEvents {
   'history:delete': (id: string) => void;
   'history:export': () => string;
   'history:import': (data: string) => void;
+  
+  // 目录相关
+  'directory:select': () => string;
 }
 
 export type IpcChannel = keyof IpcEvents; 

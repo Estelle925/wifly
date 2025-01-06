@@ -13,9 +13,13 @@ import {
   TextField,
   Typography,
   Box,
+  InputAdornment,
+  IconButton,
 } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { AppSettings } from '@/types/settings';
+import { Folder as FolderIcon } from '@mui/icons-material';
+import { IpcRendererManager } from '@/shared/IpcManager';
 
 interface SettingsDialogProps {
   open: boolean;
@@ -48,6 +52,17 @@ const SettingsDialog: React.FC<SettingsDialogProps> = ({
     onClose();
   };
 
+  const handleSelectDirectory = async () => {
+    try {
+      const path = await IpcRendererManager.invoke('directory:select');
+      if (path) {
+        handleChange('downloadPath', path);
+      }
+    } catch (error) {
+      console.error('Error selecting directory:', error);
+    }
+  };
+
   return (
     <Dialog 
       open={open} 
@@ -64,6 +79,35 @@ const SettingsDialog: React.FC<SettingsDialogProps> = ({
       <DialogTitle>{t('settings.title')}</DialogTitle>
       <DialogContent>
         <Box sx={{ py: 2 }}>
+          <FormControl fullWidth sx={{ mb: 2 }}>
+            <Typography 
+              variant="subtitle2" 
+              gutterBottom
+              sx={{ color: 'rgba(255,255,255,0.9)' }}
+            >
+              {t('settings.userName')}
+            </Typography>
+            <TextField
+              value={localSettings.userName}
+              onChange={(e) => handleChange('userName', e.target.value)}
+              fullWidth
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  color: '#fff',
+                  '& fieldset': {
+                    borderColor: 'rgba(0,255,245,0.3)',
+                  },
+                  '&:hover fieldset': {
+                    borderColor: 'rgba(0,255,245,0.5)',
+                  },
+                  '&.Mui-focused fieldset': {
+                    borderColor: '#00fff5',
+                  },
+                },
+              }}
+            />
+          </FormControl>
+
           <FormControl fullWidth sx={{ mb: 2 }}>
             <Typography 
               variant="subtitle2" 
@@ -96,27 +140,49 @@ const SettingsDialog: React.FC<SettingsDialogProps> = ({
           </FormControl>
 
           <FormControl fullWidth sx={{ mb: 2 }}>
-            <Typography variant="subtitle2" gutterBottom>
-              {t('settings.theme')}
-            </Typography>
-            <Select
-              value={localSettings.theme}
-              onChange={(e) => handleChange('theme', e.target.value as AppSettings['theme'])}
+            <Typography 
+              variant="subtitle2" 
+              gutterBottom
+              sx={{ color: 'rgba(255,255,255,0.9)' }}
             >
-              <MenuItem value="light">{t('settings.theme.light')}</MenuItem>
-              <MenuItem value="dark">{t('settings.theme.dark')}</MenuItem>
-              <MenuItem value="system">{t('settings.theme.system')}</MenuItem>
-            </Select>
-          </FormControl>
-
-          <FormControl fullWidth sx={{ mb: 2 }}>
-            <Typography variant="subtitle2" gutterBottom>
               {t('settings.downloadPath')}
             </Typography>
             <TextField
               value={localSettings.downloadPath}
               onChange={(e) => handleChange('downloadPath', e.target.value)}
+              InputProps={{
+                readOnly: true,
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton 
+                      onClick={handleSelectDirectory}
+                      sx={{ 
+                        color: '#00fff5',
+                        '&:hover': {
+                          color: '#5ffffa'
+                        }
+                      }}
+                    >
+                      <FolderIcon />
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
               fullWidth
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  color: '#fff',
+                  '& fieldset': {
+                    borderColor: 'rgba(0,255,245,0.3)',
+                  },
+                  '&:hover fieldset': {
+                    borderColor: 'rgba(0,255,245,0.5)',
+                  },
+                  '&.Mui-focused fieldset': {
+                    borderColor: '#00fff5',
+                  },
+                },
+              }}
             />
           </FormControl>
 

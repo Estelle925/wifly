@@ -1,6 +1,6 @@
 export interface AppSettings {
-  theme: 'light' | 'dark' | 'system';
   language: string;
+  userName: string;
   autoStart: boolean;
   minimizeToTray: boolean;
   enableAnimations: boolean;
