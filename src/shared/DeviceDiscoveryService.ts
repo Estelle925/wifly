@@ -3,9 +3,19 @@ import { SignalingService } from './SignalingService';
 import { Device, DeviceInfo } from '@/types/device';
 import { machineId } from 'node-machine-id';
 import os from 'os';
+import { NetworkScanner } from './NetworkScanner';
+
+// 添加设备分组和过滤功能
+interface DeviceGroup {
+  id: string;
+  name: string;
+  devices: string[]; // 设备ID数组
+}
 
 export class DeviceDiscoveryService extends EventEmitter {
   private devices: Map<string, Device>;
+  private groups: Map<string, DeviceGroup>;
+  private networkScanner: NetworkScanner;
   private signalingService: SignalingService;
   private deviceInfo: DeviceInfo;
   private deviceId: string;
@@ -14,6 +24,8 @@ export class DeviceDiscoveryService extends EventEmitter {
   constructor(signalingService: SignalingService) {
     super();
     this.devices = new Map();
+    this.groups = new Map();
+    this.networkScanner = new NetworkScanner();
     this.signalingService = signalingService;
     this.deviceId = '';
     this.deviceInfo = this.getDeviceInfo();
@@ -134,6 +146,72 @@ export class DeviceDiscoveryService extends EventEmitter {
     if (this.heartbeatInterval) {
       clearInterval(this.heartbeatInterval);
       this.heartbeatInterval = null;
+    }
+  }
+
+  // 添加设备过滤方法
+  getFilteredDevices(filters: {
+    type?: string;
+    os?: string;
+    group?: string;
+  }): Device[] {
+    return Array.from(this.devices.values()).filter(device => {
+      if (filters.type && device.type !== filters.type) return false;
+      if (filters.os && !device.os.includes(filters.os)) return false;
+      if (filters.group && !this.isDeviceInGroup(device.id, filters.group)) return false;
+      return true;
+    });
+  }
+
+  // 设备分组管理
+  createGroup(name: string): string {
+    const id = `group_${Date.now()}`;
+    this.groups.set(id, { id, name, devices: [] });
+    return id;
+  }
+
+  addDeviceToGroup(deviceId: string, groupId: string) {
+    const group = this.groups.get(groupId);
+    if (group && !group.devices.includes(deviceId)) {
+      group.devices.push(deviceId);
+      this.emit('groupUpdated', group);
+    }
+  }
+
+  private isDeviceInGroup(deviceId: string, groupId: string): boolean {
+    return this.groups.get(groupId)?.devices.includes(deviceId) || false;
+  }
+
+  // 扫描局域网设备
+  async scanLocalNetwork(options?: {
+    timeout?: number;
+    ipRange?: { start: string; end: string };
+  }) {
+    try {
+      let devices: Device[];
+      if (options?.ipRange) {
+        devices = await this.networkScanner.scanRange(
+          options.ipRange.start,
+          options.ipRange.end
+        );
+      } else {
+        devices = await this.networkScanner.scan();
+      }
+
+      // 更新设备列表
+      devices.forEach(device => {
+        this.updateDevice({
+          ...device,
+          status: 'online',
+          lastSeen: Date.now()
+        });
+      });
+
+      // 发出扫描完成事件
+      this.emit('scanComplete', devices);
+    } catch (error) {
+      console.error('Error scanning network:', error);
+      this.emit('scanError', error);
     }
   }
 } 

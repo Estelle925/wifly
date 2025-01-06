@@ -2,7 +2,14 @@
   "compilerOptions": {
     "target": "ES6",
     "module": "CommonJS",
-    "lib": ["DOM", "ES2020"],
+    "lib": [
+      "DOM",
+      "DOM.Iterable",
+      "ESNext",
+      "WebWorker",
+      "WebWorker.ImportScripts",
+      "ScriptHost"
+    ],
     "jsx": "react",
     "strict": true,
     "esModuleInterop": true,
