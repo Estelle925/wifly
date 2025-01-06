@@ -21,13 +21,29 @@ const DeviceList: React.FC<DeviceListProps> = ({ devices, onDeviceSelect }) => {
   const { t } = useTranslation();
 
   return (
-    <Paper elevation={2}>
-      <List sx={{ width: '100%', bgcolor: 'background.paper' }}>
+    <Paper 
+      elevation={3}
+      sx={{
+        background: 'rgba(255,255,255,0.7)',
+        backdropFilter: 'blur(10px)',
+        borderRadius: 4,
+        overflow: 'hidden'
+      }}
+    >
+      <List sx={{ width: '100%' }}>
         {devices.length === 0 ? (
-          <ListItem>
+          <ListItem sx={{ py: 4 }}>
             <ListItemText
-              primary={t('noDevicesFound')}
-              secondary={t('waitingForDevices')}
+              primary={
+                <Typography variant="h6" align="center" color="text.secondary">
+                  {t('noDevicesFound')}
+                </Typography>
+              }
+              secondary={
+                <Typography variant="body2" align="center" color="text.secondary" sx={{ mt: 1 }}>
+                  {t('waitingForDevices')}
+                </Typography>
+              }
             />
           </ListItem>
         ) : (
@@ -37,25 +53,39 @@ const DeviceList: React.FC<DeviceListProps> = ({ devices, onDeviceSelect }) => {
               button
               onClick={() => onDeviceSelect(device)}
               sx={{
+                transition: 'all 0.3s ease',
                 '&:hover': {
-                  bgcolor: 'action.hover',
+                  transform: 'translateX(8px)',
+                  bgcolor: 'rgba(132, 250, 176, 0.1)',
                 },
               }}
             >
               <ListItemAvatar>
-                <Avatar>
+                <Avatar
+                  sx={{
+                    background: 'linear-gradient(45deg, #84fab0 30%, #8fd3f4 90%)',
+                  }}
+                >
                   <ComputerIcon />
                 </Avatar>
               </ListItemAvatar>
               <ListItemText
-                primary={device.name}
+                primary={
+                  <Typography variant="subtitle1" fontWeight="medium">
+                    {device.name}
+                  </Typography>
+                }
                 secondary={
                   <Typography
-                    component="span"
                     variant="body2"
-                    color="text.secondary"
+                    sx={{
+                      color: 'text.secondary',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 1
+                    }}
                   >
-                    {device.os} - {device.ip}
+                    {device.os} • {device.ip}
                   </Typography>
                 }
               />
