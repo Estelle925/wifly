@@ -1,16 +1,23 @@
 import React from 'react';
 import {
+  Box,
+  Paper,
+  Typography,
+  CircularProgress,
   List,
   ListItem,
   ListItemAvatar,
   ListItemText,
   Avatar,
-  Typography,
-  Paper,
+  Fade,
+  Grid,
 } from '@mui/material';
-import { Computer as ComputerIcon } from '@mui/icons-material';
-import { Device } from '@/types/device';
+import {
+  Computer as ComputerIcon,
+  PhoneIphone as PhoneIcon,
+} from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
+import { Device } from '@/types/device';
 
 interface DeviceListProps {
   devices: Device[];
@@ -20,80 +27,83 @@ interface DeviceListProps {
 const DeviceList: React.FC<DeviceListProps> = ({ devices, onDeviceSelect }) => {
   const { t } = useTranslation();
 
+  if (devices.length === 0) {
+    return (
+      <Paper
+        sx={{
+          p: 4,
+          textAlign: 'center',
+          background: 'rgba(26,26,26,0.7)',
+          backdropFilter: 'blur(12px)',
+          border: '1px solid rgba(255,255,255,0.1)',
+          borderRadius: '16px',
+          boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
+        }}
+      >
+        <Typography
+          variant="h6"
+          sx={{
+            color: 'rgba(255,255,255,0.7)',
+            mb: 1,
+          }}
+        >
+          {t('noDevicesFound')}
+        </Typography>
+        <Typography
+          variant="body2"
+          sx={{
+            color: 'rgba(255,255,255,0.5)',
+            fontStyle: 'italic',
+          }}
+        >
+          {t('waitingForDevices')}
+        </Typography>
+      </Paper>
+    );
+  }
+
   return (
-    <Paper 
-      elevation={3}
-      sx={{
-        background: 'rgba(255,255,255,0.7)',
-        backdropFilter: 'blur(10px)',
-        borderRadius: 4,
-        overflow: 'hidden'
-      }}
-    >
-      <List sx={{ width: '100%' }}>
-        {devices.length === 0 ? (
-          <ListItem sx={{ py: 4 }}>
-            <ListItemText
-              primary={
-                <Typography variant="h6" align="center" color="text.secondary">
-                  {t('noDevicesFound')}
-                </Typography>
+    <Grid container spacing={2}>
+      {devices.map((device) => (
+        <Grid item xs={12} sm={6} md={4} key={device.id}>
+          <Paper
+            onClick={() => onDeviceSelect(device)}
+            sx={{
+              p: 3,
+              cursor: 'pointer',
+              background: 'rgba(26,26,26,0.7)',
+              backdropFilter: 'blur(12px)',
+              border: '1px solid rgba(255,255,255,0.1)',
+              borderRadius: '16px',
+              transition: 'all 0.3s ease',
+              '&:hover': {
+                transform: 'translateY(-5px)',
+                boxShadow: '0 8px 32px rgba(0,255,245,0.15)',
+                border: '1px solid rgba(0,255,245,0.3)',
               }
-              secondary={
-                <Typography variant="body2" align="center" color="text.secondary" sx={{ mt: 1 }}>
-                  {t('waitingForDevices')}
-                </Typography>
-              }
-            />
-          </ListItem>
-        ) : (
-          devices.map((device) => (
-            <ListItem
-              key={device.id}
-              button
-              onClick={() => onDeviceSelect(device)}
+            }}
+          >
+            <Typography
+              variant="h6"
               sx={{
-                transition: 'all 0.3s ease',
-                '&:hover': {
-                  transform: 'translateX(8px)',
-                  bgcolor: 'rgba(132, 250, 176, 0.1)',
-                },
+                color: '#fff',
+                mb: 1,
               }}
             >
-              <ListItemAvatar>
-                <Avatar
-                  sx={{
-                    background: 'linear-gradient(45deg, #84fab0 30%, #8fd3f4 90%)',
-                  }}
-                >
-                  <ComputerIcon />
-                </Avatar>
-              </ListItemAvatar>
-              <ListItemText
-                primary={
-                  <Typography variant="subtitle1" fontWeight="medium">
-                    {device.name}
-                  </Typography>
-                }
-                secondary={
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      color: 'text.secondary',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 1
-                    }}
-                  >
-                    {device.os} • {device.ip}
-                  </Typography>
-                }
-              />
-            </ListItem>
-          ))
-        )}
-      </List>
-    </Paper>
+              {device.name}
+            </Typography>
+            <Typography
+              variant="body2"
+              sx={{
+                color: 'rgba(255,255,255,0.7)',
+              }}
+            >
+              {device.id}
+            </Typography>
+          </Paper>
+        </Grid>
+      ))}
+    </Grid>
   );
 };
 
