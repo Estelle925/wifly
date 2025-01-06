@@ -1,5 +1,5 @@
 import { app } from 'electron';
-import fs from 'fs/promises';
+import * as fs from 'fs';
 import path from 'path';
 import { FileProgress } from './FileTransferManager';
 
@@ -15,18 +15,34 @@ export interface TransferRecord {
 }
 
 export class TransferHistoryManager {
-  private historyPath: string;
+  private historyFile: string;
   private history: TransferRecord[] = [];
   private maxHistoryItems = 1000;
 
   constructor() {
-    this.historyPath = path.join(app.getPath('userData'), 'transfer-history.json');
-    this.loadHistory();
+    // 获取应用数据目录
+    const userDataPath = app.getPath('userData');
+    this.historyFile = path.join(userDataPath, 'transfer-history.json');
+    
+    // 确保目录存在
+    this.ensureDirectoryExists();
+  }
+
+  private ensureDirectoryExists() {
+    const dir = path.dirname(this.historyFile);
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+    
+    // 如果历史文件不存在，创建一个空的
+    if (!fs.existsSync(this.historyFile)) {
+      fs.writeFileSync(this.historyFile, '[]', 'utf8');
+    }
   }
 
   private async loadHistory() {
     try {
-      const data = await fs.readFile(this.historyPath, 'utf-8');
+      const data = await fs.promises.readFile(this.historyFile, 'utf-8');
       this.history = JSON.parse(data);
     } catch (error) {
       console.error('Error loading transfer history:', error);
@@ -36,7 +52,7 @@ export class TransferHistoryManager {
 
   private async saveHistory() {
     try {
-      await fs.writeFile(this.historyPath, JSON.stringify(this.history));
+      await fs.promises.writeFile(this.historyFile, JSON.stringify(this.history));
     } catch (error) {
       console.error('Error saving transfer history:', error);
     }

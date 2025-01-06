@@ -136,7 +136,7 @@ const App: React.FC = () => {
         </Box>
         <FileSelectDialog
           open={fileSelectOpen}
-          device={selectedDevice!}
+          device={selectedDevice}
           onClose={() => setFileSelectOpen(false)}
           onFilesSelected={handleFilesSelected}
         />

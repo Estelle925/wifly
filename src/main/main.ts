@@ -28,8 +28,26 @@ async function createWindow() {
       webPreferences: {
         nodeIntegration: true,
         contextIsolation: false,
+        webSecurity: true,
+        sandbox: false
       },
     });
+
+    // 设置 CSP
+    mainWindow.webContents.session.webRequest.onHeadersReceived((details, callback) => {
+      callback({
+        responseHeaders: {
+          ...details.responseHeaders,
+          'Content-Security-Policy': [
+            "default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob:"
+          ]
+        }
+      });
+    });
+
+    // 添加路径日志以便调试
+    const htmlPath = path.join(app.getAppPath(), 'dist', 'index.html');
+    console.log('Loading HTML from:', htmlPath);
 
     // 添加错误处理
     mainWindow.webContents.on('crashed', (e) => {
@@ -59,11 +77,11 @@ async function createWindow() {
 
     if (process.env.NODE_ENV === 'development') {
       console.log('Loading development file...');
-      await mainWindow.loadFile(path.join(__dirname, '../index.html'));
+      await mainWindow.loadFile(htmlPath);
       mainWindow.webContents.openDevTools();
     } else {
       console.log('Loading production file...');
-      await mainWindow.loadFile(path.join(__dirname, '../index.html'));
+      await mainWindow.loadFile(htmlPath);
     }
 
     // 处理窗口最小化
@@ -89,6 +107,11 @@ async function createWindow() {
 
   } catch (error) {
     console.error('Error creating window:', error);
+    // 添加更详细的错误信息
+    if (error instanceof Error) {
+      console.error('Error details:', error.message);
+      console.error('Stack:', error.stack);
+    }
   }
 }
 

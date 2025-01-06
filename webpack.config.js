@@ -40,15 +40,10 @@ module.exports = {
   plugins: [
     new CopyPlugin({
       patterns: [
-        { 
-          from: 'src/assets',
-          to: 'assets',
-          noErrorOnMissing: true
-        },
         {
           from: 'src/index.html',
-          to: 'index.html'
-        }
+          to: 'index.html',
+        },
       ],
     }),
   ],

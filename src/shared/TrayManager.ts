@@ -1,99 +1,59 @@
-import { Tray, Menu, app, BrowserWindow, shell } from 'electron';
-import path from 'path';
-import { t } from 'i18next';
+import { Tray, Menu, BrowserWindow, nativeImage } from 'electron';
 import { SettingsManager } from './SettingsManager';
 
 export class TrayManager {
   private tray: Tray | null = null;
-  private mainWindow: BrowserWindow;
+  private window: BrowserWindow;
   private settingsManager: SettingsManager;
 
-  constructor(mainWindow: BrowserWindow, settingsManager: SettingsManager) {
-    this.mainWindow = mainWindow;
+  constructor(window: BrowserWindow, settingsManager: SettingsManager) {
+    this.window = window;
     this.settingsManager = settingsManager;
     this.createTray();
   }
 
   private createTray() {
-    try {
-      const iconPath = path.join(__dirname, '..', 'assets', 'tray-icon.png');
-      this.tray = new Tray(iconPath);
-      this.tray.setToolTip('WiFly');
-      this.updateContextMenu();
-    } catch (error) {
-      console.error('Failed to create tray:', error);
-      // 使用一个默认的空白图标或内置图标
-      const defaultIcon = path.join(__dirname, '..', 'assets', 'default-icon.png');
-      this.tray = new Tray(defaultIcon);
-    }
-  }
-
-  private updateContextMenu() {
+    // 创建一个简单的图标
+    const icon = nativeImage.createFromDataURL(`
+      data:image/png;base64,
+      iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAAdgAAAHYBTnsmCAAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAABSdEVYdENvcHlyaWdodABDQzAgUHVibGljIERvbWFpbiBEZWRpY2F0aW9uIGh0dHA6Ly9jcmVhdGl2ZWNvbW1vbnMub3JnL3B1YmxpY2RvbWFpbi96ZXJvLzEuMC/g6u7RAAAAB3RJTUUH5QQQCQkjvgk3IAAAADFJREFUOMtjYBgF9AH/gfg/BebDxBgZGRkYGRgYGP79+8fAwMDAyMTExAjX9H8UUAcAAO8LCwwUHAkKAAAAAElFTkSuQmCC
+    `);
+    
+    this.tray = new Tray(icon);
+    
     const contextMenu = Menu.buildFromTemplate([
       {
-        label: t('tray.show'),
-        click: () => this.mainWindow.show(),
-      },
-      {
-        label: t('tray.hide'),
-        click: () => this.mainWindow.hide(),
-      },
-      { type: 'separator' },
-      {
-        label: t('tray.openDownloadFolder'),
+        label: '显示窗口',
         click: () => {
-          shell.openPath(this.settingsManager.get('downloadPath'));
+          this.window.show();
         },
       },
       {
-        label: t('tray.settings'),
-        submenu: [
-          {
-            label: t('tray.autoStart'),
-            type: 'checkbox',
-            checked: this.settingsManager.get('autoStart'),
-            click: (item) => {
-              this.settingsManager.setAutoStart(item.checked);
-            },
-          },
-          {
-            label: t('tray.minimizeToTray'),
-            type: 'checkbox',
-            checked: this.settingsManager.get('minimizeToTray'),
-            click: (item) => {
-              this.settingsManager.set('minimizeToTray', item.checked);
-            },
-          },
-        ],
-      },
-      { type: 'separator' },
-      {
-        label: t('tray.quit'),
-        click: () => app.quit(),
+        label: '退出',
+        click: () => {
+          this.window.destroy();
+          if (this.tray) {
+            this.tray.destroy();
+          }
+        },
       },
     ]);
 
-    this.tray?.setContextMenu(contextMenu);
+    this.tray.setContextMenu(contextMenu);
+    this.tray.setToolTip('WiFly');
   }
 
-  // 更新托盘图标
-  updateIcon(isTransferring: boolean) {
-    if (!this.tray) return;
-
-    const iconName = isTransferring ? 'tray-icon-active.png' : 'tray-icon.png';
-    const iconPath = path.join(__dirname, '..', 'assets', iconName);
-    this.tray.setImage(iconPath);
+  updateIcon(isActive: boolean) {
+    // 移除自定义图标切换逻辑
   }
 
-  // 显示气泡通知
   showNotification(title: string, body: string) {
-    if (!this.tray) return;
-
-    this.tray.displayBalloon({
-      title,
-      content: body,
-      icon: path.join(__dirname, '..', 'assets', 'icon.png'),
-    });
+    if (this.tray) {
+      this.tray.displayBalloon({
+        title,
+        content: body,
+      });
+    }
   }
 
   destroy() {

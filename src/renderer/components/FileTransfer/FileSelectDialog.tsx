@@ -13,7 +13,7 @@ import { Device } from '@/types/device';
 
 interface FileSelectDialogProps {
   open: boolean;
-  device: Device;
+  device: Device | null;
   onClose: () => void;
   onFilesSelected: (files: File[]) => void;
 }
@@ -25,6 +25,10 @@ const FileSelectDialog: React.FC<FileSelectDialogProps> = ({
   onFilesSelected,
 }) => {
   const { t } = useTranslation();
+
+  if (!device) {
+    return null;
+  }
 
   const handleFilesSelected = (files: File[]) => {
     onFilesSelected(files);
